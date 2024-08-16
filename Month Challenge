@@ -1,0 +1,43 @@
+///In this MYSQL challenge, the table provided shows all new users signing up on a specific date in the format MM-DD-YYYY. Your query should output the change from one month to the next. Because the first month has no preceding month, your output should skip that row. ///
+ 
+ SELECT
+  monthname(test1.date) AS MONTH,
+  COUNT(test1.date) AS Total
+FROM
+  TIL_PLAYGROUND.TEMP.CASIANA_TEST as test1
+GROUP BY 
+monthname(test1.date)
+ORDER BY 
+ COUNT(test1.date);
+ 
+///Let's get the previous month column. We expect to see 0 for January//
+
+SELECT 
+  monthname(test1.date) AS MONTH,
+  COUNT(test1.date) AS Total,
+  (
+    SELECT COUNT(test2.date)
+    FROM TIL_PLAYGROUND.TEMP.CASIANA_TEST as test2
+    WHERE MONTH(test2.date) = MONTH(test1.date) - 1
+  ) AS PreviousMonthTotal
+FROM 
+  TIL_PLAYGROUND.TEMP.CASIANA_TEST as test1
+GROUP BY 
+  month(test1.date), monthname(test1.date)
+ORDER BY 
+  month(test1.date) ASC;
+
+  ///LET'S SEE THE CHANGES//
+ SELECT 
+  monthname(test1.date) AS MONTH,
+  COUNT(test1.date) -
+  (
+  SELECT COUNT(test2.date)
+  FROM TIL_PLAYGROUND.TEMP.CASIANA_TEST as test2
+  WHERE month(test2.date)= month(test1.date) -1
+  ) AS MonthToMonthChange
+  FROM TIL_PLAYGROUND.TEMP.CASIANA_TEST as test1
+  WHERE month(test1.date) !=1
+  GROUP BY MONTH(test1.date), MONTHNAME(test1.date)
+  ORDER BY MONTH(test1.date) ASC;
+
